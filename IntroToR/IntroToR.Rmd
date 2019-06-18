@@ -1,0 +1,399 @@
+---
+title: "Introduction To R"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+```
+
+
+## Installing R and RStudio
+
+- Installing R
+  - Download appropriate R installer for your OS
+  - Windows: https://cran.r-project.org/bin/windows/base/
+  - Mac: https://cran.r-project.org/bin/macosx/
+  - Linux: https://cran.r-project.org/bin/linux/
+<br />
+<br />
+- Installing RStudio
+  - Download appropriate RStudio installer for you OS
+  - https://www.rstudio.com/products/rstudio/download/
+
+## R Objects: Overview
+
+According to Chambers (2008), "everything in R is an object" and "nearly everything that happends in R is a function call". But what does this mean for us from a practical standpoint? 
+
+From a high-level view:
+
+- Objects are data structures that can be manipulated
+- Every object can be referred to by either a variable or symbol
+- Objects are pointers to R data types represented by structures defined in underlying C code
+
+### Creating R Objects
+
+To create an R object, the assignment operator `<-` is used to assign an R object to a variable. The variable can then be used to reference that R object. 
+
+```{r first-R-object, exercise = TRUE}
+# Create a variable called x and assign it the value "Hello World!"
+x <- "Hello World!"
+x
+
+# Try creating a variable called y and assign it the value 10
+
+```
+
+### Data Types
+
+Every R object can be broken down into a set of 'atomic' R objects, referred to as data types. The three primary data types that we will be working with are `numeric`, `character`, and `logical`.
+
+- The `numeric` data type can be further classified as either `integer` or `double`
+- The `logical` data type can be one of two distinct values, `TRUE` or `FALSE`
+
+To determine the data type of an R object, use the `typeof()` function.
+
+```{r data-types, exercise = TRUE} 
+# numeric, L is used to indicate that this is an integer
+a_double <- 6.2
+a_int <- 10L
+
+# character
+comment <- "some text here"
+
+# logical (TRUE or FALSE)
+is_it_true <- FALSE
+
+# check type of variables
+typeof(a_double)
+typeof(a_int)
+typeof(comment)
+typeof(is_it_true)
+```
+
+### Data Structures
+
+A data structure is used to represent the relationship among a set of data elements. Practical implementations of a data structure also provide a set of operations to manipulate the elements in the data structure, including the ability to:
+
+- Access elements
+- Add elements
+- Modify elements
+- Delete elements
+
+R provides the following set of data structures in the base installation:
+
+- Vector Objects
+    - Scalar (Vector with length 1)
+    - Vector
+    - Matrix
+    - Array
+- List Objects
+    - Data Frame
+
+Vector objects can only contain data elements of the **same data type**. List objects can be composed of data elements of different data types. 
+
+In the next sections, we explore each of these data structures.
+
+## R Operators
+
+Before looking at specific R objects, below is a review of the common operators available in R.
+
+### Arithmetic Operators
+
+- +, -, *, /
+- Modulus: %%
+- Integer Division: %/%
+- Exponentiation: ^, **
+
+```{r simple-operators, exercise = TRUE}
+# Create two numeric variables (x, y) and assign them values
+x <- 3
+y <- 7
+
+# Test common arithmetic operators
+x + y
+x / y
+x^2
+y %% x
+y %/% x
+```
+
+### Logical Operators
+
+- <, >, <=, >=
+- == (equal)
+- != (not equal)
+- || (OR), 
+- \| (OR, vectorized, element-wise)
+- && (AND), 
+- & (AND, vectorized, element-wise)
+
+```{r logical-operators, exercise=TRUE}
+# Create two numeric variables, x and y, assign them values
+x <- 3
+y <- 7
+
+# Create two Boolean variables, t and f, assign them values
+t <- TRUE
+f <- FALSE
+
+# Compare numeric values using logic statements
+y > x
+y == x
+
+# Compare &&, ||
+t && f
+t || f
+
+
+```
+
+### Compare && and || to & and |
+
+- && and || return scalar value using only 1st element
+- & and | return logical vector
+
+```{r logical-vector, exercise = TRUE}
+a <- c(TRUE, FALSE, TRUE)
+b <- c(TRUE, TRUE, FALSE)
+a && b
+a & b
+```
+
+## R Objects: Vectors
+
+### Creating Vectors
+
+Vectors are used to store a contiguous set of data elements with the same data type. In fact, we already created a few vectors in the previous section (i.e. `a_int <- 6.21`) that are composed of a single element. 
+
+There are multiple ways to create a vector in R, but one of the most common ways is to use the `c()` function, referred to as the concatenate function. After a vector is created, the number of elements in a vector can be found by using the `length()` function.
+
+```{r vectors-basic, exercise = TRUE}
+# create a numeric vector with 5 values
+a_vec <- c(7, 18, 22.2, -4, 0)
+a_vec
+
+# length of vector
+length(a_vec) 
+
+# vector type
+typeof(a_vec) 
+```
+
+### Modifying Vectors
+
+With the ability to index into a vector, we can easily change the value for existing elements and add new values to the vector as well. To change the value of exisiting elements, use indexing to access these values and the `<-` operator to assign new values to those elements.
+
+```{r vectors-modify, exercise = TRUE}
+a_vec <- c(7, 18, 22.2, -4, 0)
+
+a_vec[c(2, 4)] <- c(5, 15)
+```
+
+To add elements to the end (or middle/beginning) of a vector, the `c()` operator can again be used.
+
+```{r vectors-modify2, exercise = TRUE}
+a_vec <- c(7, 18, 22.2, -4, 0)
+
+more_num <- c(10, 8, 12)
+
+a_vec <- c(a_vec, more_num)
+
+# How would you insert the more_num vec in between the 2nd and 3rd element?
+```
+
+### Indexing Vectors
+
+To access a single element or multiple elements in a vector, use the `[]` operator. This operator can be used to access elements of a vector through two different methods:
+
+- A numeric vector that contains the indices (positions) of the elements to access
+- A logical vector (with length equal to the vector we are accessing) where `TRUE` is used to indicate which elements we want to access
+
+**Note that indices start at one in R**.
+
+```{r vector-indexing, exercise = TRUE}
+a_vec <- c(7, 18, 22.2, -4, 0)
+
+# access 3rd element in the vector
+a_vec[3]
+
+# access elements 2, 3, 4 with numeric index vector
+a_vec[c(2, 3, 4)] 
+
+# access elements 1 and 3 by with logical vector
+a_vec[c(TRUE, FALSE, TRUE, FALSE, FALSE)]
+```
+
+### Vectorization
+
+A number of operations in R are 'vectorized' to operate on a set of R objects simultaneously. Vectorization not only leads to cleaner and more succinct code, but often a more efficient implementation of the operations as well. 
+
+As an example, a number of simple operations on vectors can be completed in single line of code.
+
+```{r vectorization, exercise = TRUE}
+a_vec <- c(7, 18, 22.2, -4, 0)
+
+# add 10 to each element in a_vec
+a_vec + 10 
+
+# square each element in a a_vec 
+a_vec^2 # square each element
+
+# test whether each element in a_vec is < 0
+a_vec < 0
+
+# access all elements with value < 0
+a_vec[a_vec < 0] 
+```
+
+### Coercion
+
+What happens when we try to use different data types in the same vector?
+
+R will not complain. Rather, all data elements are coerced to a common data type with the following coercion proctocols.
+
+- integer + double -> double
+- (integer / double / logical) + character -> character
+- logical + integer -> integer
+- logical + double -> double
+
+Below is an example of automatic coercion from double to character. 
+
+In addition, we also exemplify another method to define a vector by using `vector()`. This function is useful when we know the length of a vector, but the value for all elements are not known when it is created.
+
+```{r vector-coercion, exercise=TRUE}
+# create empty character vector with length 3
+a_charvec <- vector(mode = "character", length = 3L)
+a_charvec[c(1, 3)] <- c("los angeles", 10)
+a_charvec
+
+# check if each element of a_charvec != ""
+a_charvec != "" 
+
+# index with Boolean (T/F) vector
+a_charvec[a_charvec != ""]
+```
+
+## R Objects: Matrices
+
+### Creating Matrices
+
+The matrix object is a natural extension of the vector object to two dimensions. One can think of a matrix as being composed of a set of row vectors or a set of column vectors.
+
+From a data analysis perspective, matrices can be viewed as a way to store structured data, where the rows may represent observations and the columns may represent measured features collected for those observations.
+
+To create a matrix in R, use `matrix()`. The three primary values we need to pass to the matrix function are:
+
+- `data`: The set of data elements
+- `nrow`: The number of rows in the matrix
+- `ncol`: The number of columns in the matrix
+
+By default, a matrix is filled column-by-column using the data elements passed in `data`. Setting `byrow= TRUE` will fill in the matrix row-by-row. In the example below, we can think of the matrix `mat` as being a set of four row vectors or a set of 3 column vectors 
+
+```{r, echo = FALSE}
+set.seed(23594)
+```
+
+```{r matrices-create, exercise = TRUE}
+# Create matrix with 4 rows, and 3 columns
+mat <- matrix(data = rnorm(12), nrow = 4, ncol = 3)
+mat
+
+# get dimension of the matrix
+dim(mat)
+
+# get number of rows and number of columns separately
+nrow(mat)
+ncol(mat)
+```
+
+### Indexing Matrices
+
+Indexing a matrix extends the bracket notation used for vectors by providing the indices we want for each dimension of the matrix `[,]`. The first dimension refers to the row incides and the second dimension refers to the column indices.
+
+The following examples show how to index a matrix using both numeric indices and logical vectors. In addition, one example shows the use of a negation operator `-` to specify a set of incides to remove.
+
+```{r matrices-indexing, exercise=TRUE}
+# Create matrix with 4 rows, and 3 columns
+mat <- matrix(data = rnorm(12), nrow = 4, ncol = 3)
+mat
+
+# element in 4th row and 2nd column
+mat[4, 2]
+
+# all elements in 2nd row
+# leave blank to get all indices along a dimension
+mat[2, ]
+
+# negation operator to remove indices
+# returns same as above
+mat[-c(1, 3, 4), ]
+
+# select all elements in 1st row and 2nd row with elements < 0.5
+mat[1:2, mat[1, ] < 0.5]
+```
+
+## R Objects: Lists
+
+### Creating Lists
+
+Lists are 'generic' vectors that can contain elements of any R object type. The structure of lists is very similar to other list or dictionary-type objects in other programming languages (i.e. Python). 
+
+To create a list object in R, use `list()` and pass a set of `values` or a set of `name = value` pairs. 
+
+```{r lists-create, exercise = TRUE}
+# create a list with 3 elements
+# - a_vec = vector with values 1, 2, ..., 10
+# - random_letters = random sample of 5 letters
+# - tell_me_not_true = logical scalar
+a_lst <- list(
+    a_vec = 1:10,
+    random_letters = sample(letters, 5),
+    tell_me_its_not_true = FALSE
+)
+a_lst
+```
+
+### Indexing Lists
+
+Accessing specific elements of a list differs from the other objects we have looked at so far. There are three ways that we can access a specific element of a list:
+
+1) `[[{element_name}]]`
+2) `[[{element_index}]]`
+3) `$` operator
+
+```{r lists_index, exercise = TRUE}
+a_lst <- list(
+    a_vec = 1:10,
+    random_letters = sample(letters, 5),
+    tell_me_its_not_true = FALSE
+)
+a_lst
+
+a_lst[['a_vec']] # using [[{element name}]]
+
+a_lst[[1]] # using [[{element index}]]
+
+a_lst$a_vec # using $
+```   
+
+Index operators can be chained together to access elements that are nested within a list.
+
+```{r lists_index2, exercise = TRUE}
+a_lst <- list(
+    a_vec = 1:10,
+    random_letters = sample(letters, 5),
+    tell_me_its_not_true = FALSE
+)
+a_lst
+
+a_lst$a_vec[5] # 5th element of a_vec
+
+a_lst[['random_letters']][2:4] # 1st element of another_lst
+
+a_lst[c('a_vec', 'tell_me_its_not_true')] # access sublist
+```
+
+
+
