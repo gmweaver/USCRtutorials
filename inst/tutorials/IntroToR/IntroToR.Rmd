@@ -136,8 +136,6 @@ y == x
 # Compare &&, ||
 t && f
 t || f
-
-
 ```
 
 ### Compare && and || to & and |
@@ -589,11 +587,213 @@ dat <- rbind(dat, dat_more)
 dat
 ```
 
-## Reading and Writing
+## Control Structures
+
+### Overview
+
+Control structures allow us to control the flow of code execution. A number of control structures are available in R to conditionally execute code or repeat the execution of a section of code based on a set of conditions. 
+
+- if/else 
+- for loops
+- while loops
+- do while loops
+- repeat
+- next
+- break
+- return
+
+You may be wondering how we have made it this far without using such structures to manipulate the data structures we have encountered. 
+
+The reason for this goes back to idea of 'vectorized' code introduced earlier. 'Vectorization' actually hides some of these control structures in low-level C code. However, there may be cases where it may not be clear how to vectorize a set of operations that we want to apply to a set of data. In these cases, it may be essential to use the core control structures to accomplish our task. 
+
+Here, we will introduce two fundamental structures, if/else and for loops.
+
+### if/else
+
+The `if/else` control structure is used when we want to control whether a block of R code is executed based on a logical expression. The general syntax for a if/else statement is:
+
+```{r if-else, eval = FALSE}
+if (logical expression) {
+  # run this R code
+} else {
+  # run this other R code
+}
+```
+
+Within the `()`, we provide a logical expression that will evaluate to a scalar `TRUE` or `FALSE`. If the expression evaluates to `TRUE`, the code within the `{}` will be executed. If the expression is `FALSE`, the code in second set of `{}` will be executed. A simple example is shown below:
+
+```{r if-else-ex, exercise=TRUE}
+num1 <- 10L
+num2 <- 15L
+
+num1 == num2
+
+if (num1 == num2) {
+  cat(num1, "equals", num2)
+} else {
+  cat(num1, "does not equal", num2)
+}
+```
+
+### for loops
+
+A `for` loop executes a block of R code a fixed number of times based on an R object that we provide. The general syntax for a for loop is:
+
+```{r for-loop, eval = FALSE}
+for (elem in R_object) {
+  # some R code
+}
+```
+
+In plain English, the code above says to repeat the code in the `{}` for each element (`elem`) in the `R_obect`. As an example, we can print out each element in the vector by accessing the element directly or through indexing:
+
+```{r for-loop-ex, exercise=TRUE}
+for (elem in 1:10) {
+  print(elem)
+}
+
+some_letters <- sample(letters, 10)
+
+for (i in 1:length(some_letters)) {
+  print(some_letters[i])
+}
+```
+
+Notice that we are able to access the current element within the `{}` as we iterate through element of the vector.
+
+### if/else and for loops
+
+Control structures can be combined to iterate through an R object (i.e the column of a data frame) and conditionally execute code based on the value of each element of that R object.
+
+Consider the example in the previous section where we conditionally changed the value of "SF" to "San Francisco". We can accomplish this task using these two control structures.
+
+```{r ifelse-for-ex, exercise=TRUE}
+dat <- data.frame(
+  state = rep("CA", 8), 
+  city = c(rep("LA", 4), rep("SF", 4)),
+  age = rnorm(8, mean = 40, sd = 1),
+  stringsAsFactors = F
+)
+dat
+
+n <- nrow(dat)
+
+# using a for loop with indexing
+for (i in 1:nrow(dat)) {
+  if (dat$city[i] == "SF") {
+    dat$city[i] = "San Francisco"
+  }
+}
+dat
+```
+
+## Data Wrangling
+
+### Reading Data
+
+Base R and a number of R packages provide the ability to read data into R from a variety of sources. We will start with reading from one of the most common sources used to store data in a tabular format, a `csv` file. 
+
+The `read.csv()` function allows us to read a `csv` file into a `data.frame` from either our local computer or a remote resource (i.e. a file sitting on a server somewhere). Below we exemplify the ability to read a `csv` file from a Github repository. `header = TRUE` specifies that the first row of the file contains the name for each variable (column) in the data set.  
 
 ```{r read-data, exercise = TRUE}
 file_path <- "https://raw.githubusercontent.com/gmweaver/USCRtutorials/master/inst/tutorials/IntroToR/temp.csv"
 
-temp_work <- read.csv(file_path, header = TRUE)
-temp_work
+temperature <- read.csv(file = file_path, header = TRUE)
+temperature
+
+typeof(temperature)
+class(temperature)
 ```
+
+Let's review the structure of the `temperature` data frame.
+
+```{r prepare-temp-data}
+file_path <- "https://raw.githubusercontent.com/gmweaver/USCRtutorials/master/inst/tutorials/IntroToR/temp.csv"
+temperature <- read.csv(file = file_path, header = TRUE)
+```
+
+```{temp-str, exercise=TRUE, exercise.setup="prepare-temp-data"}
+str(temperature)
+rownames(temperature)
+colnames(temperature)
+```
+
+### Data Exploration
+
+#### Summarizing Data
+
+Before we start formally analyzing data, we should familiarize ourself with the variables in the data set. The easiest way to start doing this is to compute basic summary statistics for the variables that we are interested in and generate plots that help us better understand the underlying structure of the data.
+
+The `summary()` function provides a quick way to compute a number summary statistics for a variable or a set of variables.
+
+```{r summary-func, exercise=TRUE, exercise.setup="prepare-temp-data"}
+summary(temperature$male)
+```
+
+These summary statistics are great, but what do they mean in the context of the `male` variable, a categorical variable?
+
+The `male` variable has an `integer` data type but it is actually a binary indicator variable that is coded `1 = 'Male'` and `0 = 'Female'`. With this knowledge, we can now interpret the values computed in `summary()`.
+
+The mean value is actually telling us the proportion of males that are in the data set. The min and max tell us that there is at least one male and one female in our data set. 
+
+Most of statistics computed in `summary()` can be individually computed with other functions.
+
+```{r mean-func2, exercise=TRUE, exercise.setup="prepare-temp-data"}
+mean(temperature$male)
+median(temperature$male)
+min(temperature$male)
+max(temperature$male)
+```
+
+That's not what we expected, what does `NA` mean?
+
+`NA` is a logical value used internally by R as a missing value indicator. Looking back at the results of `summary()` function, there is in fact one missing value in the `male` variable. Fortunately, we can remove these values when computing these statistics individually.
+
+```{r mean-func, exercise=TRUE, exercise.setup="prepare-temp-data"}
+mean(temperature$male, na.rm = TRUE)
+median(temperature$male,na.rm = TRUE)
+min(temperature$male, na.rm = TRUE)
+max(temperature$male, na.rm = TRUE)
+```
+
+For categorical variables it might also be nice to see the actual number of males and females by using the `table()` function.
+
+```{r table-func, exercise=TRUE, exercise.setup="prepare-temp-data"}
+table(temperature$male)
+```
+
+A similar analysis can be done for continuous variables as well. Below are the summary statistics for the `age` variable
+
+```{r summarize-continuous, exercise=TRUE, exercise.setup="prepare-temp-data"}
+summary(temperature$age)
+mean(temperature$age, na.rm = TRUE)
+sd(temperature$age, na.rm = TRUE)
+median(temperature$age, na.rm = TRUE)
+min(temperature$age, na.rm = TRUE)
+max(temperature$age, na.rm = TRUE)
+```
+
+#### Plotting Data
+
+In addition to computing simple summary statistics, plotting data helps identify initial patterns and potentially any inconsistencies in our data.
+
+A simple boxplot provides a nice way to visualize the distribution of the `age` variable. We can also create boxplots that are stratified by `male`.
+
+```{r boxplot, exercise=TRUE, exercise.setup="prepare-temp-data"}
+boxplot(temperature$age)
+boxplot(temperature$age ~ temperature$male)
+```
+
+A histogram provides another nice way to summarize the distribution of a continuous variable and can be easily created with the `hist()` function.
+
+```{r histogram, exercise=TRUE, exercise.setup="prepare-temp-data"}
+hist(temperature$age)
+```
+
+A scatterplot can be used to capture the relationship between two continuous variables by using the the `plot()` function.
+
+```{r scatterplot, exercise=TRUE, exercise.setup="prepare-temp-data"}
+plot(mathreported ~ temp, data = temperature)
+```
+
+This is just a glimpse of the visualizations that can be created in R using only what is available in the base package. A number of additional options can be used to customize plots and in the future we will explore the `ggplot2` package, an excellent resource to create visualizations in R.
