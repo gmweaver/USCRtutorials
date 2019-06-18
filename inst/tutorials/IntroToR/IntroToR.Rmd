@@ -8,20 +8,6 @@ runtime: shiny_prerendered
 library(learnr)
 ```
 
-
-## Installing R and RStudio
-
-- Installing R
-  - Download appropriate R installer for your OS
-  - Windows: https://cran.r-project.org/bin/windows/base/
-  - Mac: https://cran.r-project.org/bin/macosx/
-  - Linux: https://cran.r-project.org/bin/linux/
-<br />
-<br />
-- Installing RStudio
-  - Download appropriate RStudio installer for you OS
-  - https://www.rstudio.com/products/rstudio/download/
-
 ## R Objects: Overview
 
 According to Chambers (2008), "everything in R is an object" and "nearly everything that happends in R is a function call". But what does this mean for us from a practical standpoint? 
@@ -29,7 +15,7 @@ According to Chambers (2008), "everything in R is an object" and "nearly everyth
 From a high-level view:
 
 - Objects are data structures that can be manipulated
-- Every object can be referred to by either a variable or symbol
+- Every object and its elements can be referred to by either a variable or symbol
 - Objects are pointers to R data types represented by structures defined in underlying C code
 
 ### Creating R Objects
@@ -41,7 +27,9 @@ To create an R object, the assignment operator `<-` is used to assign an R objec
 x <- "Hello World!"
 x
 
-# Try creating a variable called y and assign it the value 10
+# Try creating a variable called 'y' and assign it the value 10
+
+# Change the value of x to pi
 
 ```
 
@@ -50,9 +38,9 @@ x
 Every R object can be broken down into a set of 'atomic' R objects, referred to as data types. The three primary data types that we will be working with are `numeric`, `character`, and `logical`.
 
 - The `numeric` data type can be further classified as either `integer` or `double`
-- The `logical` data type can be one of two distinct values, `TRUE` or `FALSE`
+- The `logical` data type has two distinct values, `TRUE` or `FALSE`
 
-To determine the data type of an R object, use the `typeof()` function.
+To determine the type of an R object, use the `typeof()` function.
 
 ```{r data-types, exercise = TRUE} 
 # numeric, L is used to indicate that this is an integer
@@ -83,15 +71,18 @@ A data structure is used to represent the relationship among a set of data eleme
 
 R provides the following set of data structures in the base installation:
 
-- Vector Objects
-    - Scalar (Vector with length 1)
-    - Vector
-    - Matrix
-    - Array
-- List Objects
-    - Data Frame
+#### Vector Objects
 
-Vector objects can only contain data elements of the **same data type**. List objects can be composed of data elements of different data types. 
+Vector objects can only contain data elements of the **same data type**. Vector objects include:
+
+  - Scalar (Vector with length 1)
+  - Vector
+  - Matrix
+  - Array
+    
+#### List Objects
+
+List objects can be composed of data elements of different data types. A special type of list we will use a lot is the data frame. 
 
 In the next sections, we explore each of these data structures.
 
@@ -151,7 +142,7 @@ t || f
 
 ### Compare && and || to & and |
 
-- && and || return scalar value using only 1st element
+- && and || return scalar value using only 1st element of each object being compared
 - & and | return logical vector
 
 ```{r logical-vector, exercise = TRUE}
@@ -163,11 +154,13 @@ a & b
 
 ## R Objects: Vectors
 
+### Overview
+
+Vectors are used to store a contiguous set of data elements with the same data type. We already created a few vectors in the previous section (i.e. `a_int <- 6.21`) that are composed of a single element. 
+
 ### Creating Vectors
 
-Vectors are used to store a contiguous set of data elements with the same data type. In fact, we already created a few vectors in the previous section (i.e. `a_int <- 6.21`) that are composed of a single element. 
-
-There are multiple ways to create a vector in R, but one of the most common ways is to use the `c()` function, referred to as the concatenate function. After a vector is created, the number of elements in a vector can be found by using the `length()` function.
+There are multiple ways to create a vector in R, but one of the most common ways is to use the `c()` function to combine a set of data elements into vector object. After a vector is created, the number of elements in the vector can be found by using the `length()` function.
 
 ```{r vectors-basic, exercise = TRUE}
 # create a numeric vector with 5 values
@@ -179,28 +172,6 @@ length(a_vec)
 
 # vector type
 typeof(a_vec) 
-```
-
-### Modifying Vectors
-
-With the ability to index into a vector, we can easily change the value for existing elements and add new values to the vector as well. To change the value of exisiting elements, use indexing to access these values and the `<-` operator to assign new values to those elements.
-
-```{r vectors-modify, exercise = TRUE}
-a_vec <- c(7, 18, 22.2, -4, 0)
-
-a_vec[c(2, 4)] <- c(5, 15)
-```
-
-To add elements to the end (or middle/beginning) of a vector, the `c()` operator can again be used.
-
-```{r vectors-modify2, exercise = TRUE}
-a_vec <- c(7, 18, 22.2, -4, 0)
-
-more_num <- c(10, 8, 12)
-
-a_vec <- c(a_vec, more_num)
-
-# How would you insert the more_num vec in between the 2nd and 3rd element?
 ```
 
 ### Indexing Vectors
@@ -223,6 +194,32 @@ a_vec[c(2, 3, 4)]
 
 # access elements 1 and 3 by with logical vector
 a_vec[c(TRUE, FALSE, TRUE, FALSE, FALSE)]
+```
+
+### Modifying Vectors
+
+With the ability to index into a vector, we can easily change the value for existing elements and add new values to the vector as well. To change the value of exisiting elements, use indexing to access these values and the `<-` operator to assign new values to those elements.
+
+```{r vectors-modify, exercise = TRUE}
+a_vec <- c(7, 18, 22.2, -4, 0)
+a_vec
+
+a_vec[c(2, 4)] <- c(5, 15)
+a_vec
+```
+
+To add elements to the end (or middle/beginning) of a vector, `c()` or `append()` can be used.
+
+```{r vectors-modify2, exercise = TRUE}
+a_vec <- c(7, 18, 22.2, -4, 0)
+
+more_num <- c(10, 8, 12)
+
+# add more_num to end of a_vec
+c(a_vec, more_num)
+
+# add more_num after 2nd element in a_vec
+append(a_vec, more_num, after = 2)
 ```
 
 ### Vectorization
@@ -277,11 +274,13 @@ a_charvec[a_charvec != ""]
 
 ## R Objects: Matrices
 
-### Creating Matrices
+### Overview
 
 The matrix object is a natural extension of the vector object to two dimensions. One can think of a matrix as being composed of a set of row vectors or a set of column vectors.
 
 From a data analysis perspective, matrices can be viewed as a way to store structured data, where the rows may represent observations and the columns may represent measured features collected for those observations.
+
+### Creating Matrices
 
 To create a matrix in R, use `matrix()`. The three primary values we need to pass to the matrix function are:
 
@@ -334,11 +333,37 @@ mat[-c(1, 3, 4), ]
 mat[1:2, mat[1, ] < 0.5]
 ```
 
+### Modifying Matrices
+
+As with vectors, modifying elements of a matrix can be done using the `<-` operator. Index the elements of the matrix to be modified and assign an object with the same number of elements as those indexed (and preferably the same dimensions).
+
+```{r matrices-modified, exercise=TRUE}
+# Create matrix with 4 rows, and 3 columns
+mat <- matrix(data = rnorm(12), nrow = 4, ncol = 3)
+mat
+
+mat[1:2, 1:3] <- matrix(1, nrow = 2, ncol = 3)
+mat
+```
+
+Rows and columns can be added to a matrix by using `rbind()` and `cbind()`.
+
+```{r matrices-modified2, exercise=TRUE}
+mat <- matrix(data = rnorm(12), nrow = 4, ncol = 3)
+mat
+
+cbind(c(1:4), mat)
+
+rbind(mat, rep(100, 3))
+```
+
 ## R Objects: Lists
 
-### Creating Lists
+### Overview
 
-Lists are 'generic' vectors that can contain elements of any R object type. The structure of lists is very similar to other list or dictionary-type objects in other programming languages (i.e. Python). 
+Lists are 'generic' vectors that can be composed of different R object types. The structure of lists is very similar to other list or dictionary-type objects in other programming languages (i.e. Python). Lists can be very useful when dealing data that is hierarchical (i.e. from ancestry trees to JSON data). 
+
+### Creating Lists
 
 To create a list object in R, use `list()` and pass a set of `values` or a set of `name = value` pairs. 
 
@@ -347,6 +372,7 @@ To create a list object in R, use `list()` and pass a set of `values` or a set o
 # - a_vec = vector with values 1, 2, ..., 10
 # - random_letters = random sample of 5 letters
 # - tell_me_not_true = logical scalar
+
 a_lst <- list(
     a_vec = 1:10,
     random_letters = sample(letters, 5),
@@ -395,5 +421,178 @@ a_lst[['random_letters']][2:4] # 1st element of another_lst
 a_lst[c('a_vec', 'tell_me_its_not_true')] # access sublist
 ```
 
+## R Objects: Data Frames
 
+### Overview
 
+A data frame is a special type of list object composed of equal-length vectors. In addition to being able to store various vector types (unlike a matrix), data frames combine the indexing found in both list and matrix objects.The additional functionalities available in data frames make them one of the most popular objects for data analysis and statistical modelling in R.
+
+As with matrices, we can think of the rows of data frame as corresponding to individual observations and the columns as features that were measured for each observation. 
+
+### Creating Data Frames
+
+A data frame can be created by passing a set of `name = vector()` pairs to the `data.frame()` function. The data frame generated below has three columns: `state`, `city`, and `age`. Note the use of  `rnorm()` to generate random draws from a normal distribution with specified mean and standard deviation.
+
+```{r df-create, exercise=TRUE}
+dat <- data.frame(
+  state = rep("CA", 8), 
+  city = c(rep("LA", 4), rep("SF", 4)),
+  age = rnorm(8, mean = 40, sd = 5),
+  stringsAsFactors = F
+)
+dat
+```
+
+### Data Frame: Structure
+
+Similar to matrices, the dimensions of the matrix can be found be using `dim()`, `nrow()`, and `ncol()`. 
+
+If we check the data type of the data frame using `typeof()`, it is indeed a list object. The `str()` function provides a summary of an object's overall structure. This function can be very useful when dealing with list objects that have a complicated structure. The `class()` function tells use whether an R object has any additional `class`. Classes help R functions understand how to handle different R objects. 
+
+In the example below, the `data.frame` class tells `nrow()` exactly which version of this fucntion to use for a data frame. 
+
+```{r df-str, exercise = TRUE}
+dat <- data.frame(
+  state = rep("CA", 8), 
+  city = c(rep("LA", 4), rep("SF", 4)),
+  age = rnorm(8, mean = 40, sd = 1),
+  stringsAsFactors = F
+)
+
+# dimensions of data frame
+dim(dat)
+nrow(dat)
+ncol(dat)
+
+# additional information for data frame
+typeof(dat)
+str(dat)
+class(dat)
+
+```
+
+### Data Frame: Indexing
+
+All the indexing methods learned previously can be applied to data frames. List-like indexing can be used to access a particular column or set of columns. Matrix-like indexing allows us to easily subset a data frame by both rows and columns.
+
+```{r df-index, exercise=TRUE}
+dat <- data.frame(
+  state = rep("CA", 8), 
+  city = c(rep("LA", 4), rep("SF", 4)),
+  age = rnorm(8, mean = 40, sd = 1),
+  stringsAsFactors = F
+)
+
+# Similar indexing functionality of a list
+dat$city
+
+# Subset by rows and columns - bracket operator + data.frame class
+dat[1:5, c("city", "age")]
+```
+
+### Data Frame: Adding Columns
+
+As with lists, adding new columns can be done by using indexing to specify the new column name and the `<-` operator to pass the values for the new column. 
+
+Remember that the length of the vector object passed should be either one if you want all values to be the same for the new column or equal to the number of rows in the data frame in most cases. 
+
+The `cbind()` function can also be used to add columns to the begin or end of a data frame.
+
+```{r df-add, exercise=TRUE}
+dat <- data.frame(
+  state = rep("CA", 8), 
+  city = c(rep("LA", 4), rep("SF", 4)),
+  age = rnorm(8, mean = 40, sd = 1),
+  stringsAsFactors = F
+)
+
+# get number of rows
+n <- nrow(dat)
+
+# simulate age and add to data frame
+height_sim <- rnorm(n, mean = 50, sd = 2) 
+dat[['height']] <- height_sim 
+
+# simluate gender and add to data frame
+gen_sim <- sample(c('M', 'F'), n, replace = TRUE) 
+dat$gender <- gen_sim
+
+# add country
+dat$country <- "US"
+
+dat
+```
+
+### Data Frame: Modify Columns
+
+Columns in a data frame can also be modified by using the index and assignment operators.
+
+```{r df-modify, exercise=TRUE}
+dat <- data.frame(
+  state = rep("CA", 8), 
+  city = c(rep("LA", 4), rep("SF", 4)),
+  age = rnorm(8, mean = 40, sd = 1),
+  stringsAsFactors = F
+)
+
+# add 5 to all ages
+dat$age <- dat$age + 5
+
+# change 'SF' to 'San Francisco'
+
+# which indices equal 'SF'
+is_sf <- dat$city == "SF"
+is_sf
+
+# change those indices
+dat$city[is_sf] <- "San Francisco"
+
+dat
+```
+
+### Data Frame: Remove Columns
+
+Columns in a data frame can be removed by either setting them to `NULL` or using the negation operator and index (or indices) to be removed. `NULL` is another R object and generally refers to objects that are undefined.
+
+```{r df-remove, exercise=TRUE}
+dat <- data.frame(
+  state = rep("CA", 8), 
+  city = c(rep("LA", 4), rep("SF", 4)),
+  age = rnorm(8, mean = 40, sd = 1),
+  stringsAsFactors = F
+)
+
+dat$age <- NULL # using NULL
+dat <- dat[-c(2)] # negation operator and index
+dat
+```
+
+### Data Frame: Add Rows
+
+The easiest way to add rows to a data frame is the `rbind()` function.
+
+```{r df-add-rows, exercise=TRUE}
+dat <- data.frame(
+  state = rep("CA", 8), 
+  city = c(rep("LA", 4), rep("SF", 4)),
+  age = rnorm(8, mean = 40, sd = 1),
+  stringsAsFactors = F
+)
+
+dat_more <- data.frame(
+  state = c("CA", "CA"), 
+  city = c("LA", "SF"),
+  age = c(50, 35),
+  stringsAsFactors = F
+)
+dat <- rbind(dat, dat_more)
+dat
+```
+
+## Reading and Writing
+
+```{r}
+getwd()
+
+check <- read.csv("temp.csv")
+check
