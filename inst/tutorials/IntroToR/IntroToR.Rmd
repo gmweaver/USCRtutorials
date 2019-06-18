@@ -591,8 +591,9 @@ dat
 
 ## Reading and Writing
 
-```{r}
-getwd()
+```{r read-data, exercise = TRUE}
+file_path <- "https://raw.githubusercontent.com/gmweaver/USCRtutorials/master/inst/tutorials/IntroToR/temp.csv"
 
-check <- read.csv("temp.csv")
-check
+temp_work <- read.csv(file_path)
+temp_work
+```
